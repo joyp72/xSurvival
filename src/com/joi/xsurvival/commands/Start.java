@@ -9,7 +9,7 @@ import com.joi.xsurvival.maps.MapManager;
 public class Start extends Commands {
 	
 	public Start() {
-		super("plugin.default", "Start a game", "", new String[] { "s" });
+		super("xs.default", "Start a game", "", new String[] { "s" });
 	}
 	
 	@Override

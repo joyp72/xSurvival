@@ -11,7 +11,7 @@ import com.joi.xsurvival.maps.MapManager;
 public class Leave extends Commands {
 
 	public Leave() {
-		super("plugin.default", "Leave a map", "", new String[] { "l" });
+		super("xs.default", "Leave a map", "", new String[] { "l" });
 	}
 
 	@Override

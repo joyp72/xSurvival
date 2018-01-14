@@ -9,7 +9,7 @@ import com.joi.xsurvival.maps.MapManager;
 public class Stop extends Commands {
 	
 	public Stop() {
-		super("plugin.admin", "Stop a game", "", new String[] { "" });
+		super("xs.admin", "Stop a game", "", new String[] { "" });
 	}
 	
 	@Override

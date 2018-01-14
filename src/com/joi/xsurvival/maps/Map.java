@@ -153,6 +153,12 @@ public class Map {
 	public Location getSpawn() {
 		return spawn;
 	}
+	
+	public void setSpawn(Location l) {
+		spawn = l;
+		saveToConfig();
+		checkState();
+	}
 
 	public String getName() {
 		return name;

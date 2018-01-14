@@ -29,7 +29,7 @@ public class CommandsManager implements CommandExecutor {
 	}
 
 	public void setup() {
-		Main.get().getCommand("command").setExecutor(this);
+		Main.get().getCommand("xs").setExecutor(this);
 		cmds.add(new Join());
 		cmds.add(new Create());
 		cmds.add(new com.joi.xsurvival.commands.List());
@@ -37,6 +37,7 @@ public class CommandsManager implements CommandExecutor {
 		cmds.add(new Start());
 		cmds.add(new Stop());
 		cmds.add(new Test());
+		cmds.add(new SetSpawn());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String arg2, String[] args) {
@@ -44,7 +45,7 @@ public class CommandsManager implements CommandExecutor {
 			return true;
 		}
 		Player p = (Player) sender;
-		if (!cmd.getName().equalsIgnoreCase("command")) {
+		if (!cmd.getName().equalsIgnoreCase("xs")) {
 			return true;
 		}
 		if (args.length != 0) {

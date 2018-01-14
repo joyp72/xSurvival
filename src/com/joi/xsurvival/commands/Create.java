@@ -9,7 +9,7 @@ import com.joi.xsurvival.maps.MapManager;
 public class Create extends Commands {
 
 	public Create() {
-		super("plugin.admin", "Create a Map", "<name>", new String[] { "c", "createmap" });
+		super("xs.admin", "Create a Map", "<name>", new String[] { "c", "createmap" });
 	}
 
 	@Override

@@ -6,29 +6,27 @@ import com.joi.xsurvival.commands.MessageManager.MessageType;
 import com.joi.xsurvival.maps.Map;
 import com.joi.xsurvival.maps.MapManager;
 
-public class Join extends Commands {
 
-	public Join() {
-		super("xs.default", "Join a map.", "<map>", new String[] { "j" });
+public class SetSpawn extends Commands {
+	
+	public SetSpawn() {
+		super("xs.admin", "Set the Spawn of a map", "<map>", new String[] { "sal" });
 	}
-
+	
 	@Override
-	public void onCommand(Player sender, final String[] args) {
+	public void onCommand(Player sender, String[] args) {
 		if (args.length == 0) {
 			MessageManager.get().message(sender, "You must specify a map!", MessageType.BAD);
 			return;
 		}
-		Map m = MapManager.get().getMap(sender);
-		if (m != null) {
-			MessageManager.get().message(sender, "You are already in a map!", MessageType.BAD);
-			return;
-		}
 		String id = args[0];
-		Map m2 = MapManager.get().getMap(id);
-		if (m2 == null) {
+		Map m = MapManager.get().getMap(id);
+		if (m == null ) {
 			MessageManager.get().message(sender, "Unknown map.", MessageType.BAD);
 			return;
 		}
-		m2.addPlayer(sender);
+		m.setSpawn(sender.getLocation());
+		MessageManager.get().message(sender, "Spawn set for: " + m.getName(), MessageType.GOOD);
 	}
+
 }

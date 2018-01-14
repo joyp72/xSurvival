@@ -11,7 +11,7 @@ import net.md_5.bungee.api.ChatColor;
 public class List extends Commands {
 
 	public List() {
-		super("plugin.default", "List all maps", "", new String[] { "" });
+		super("xs.default", "List all maps", "", new String[] { "" });
 	}
 
 	@Override
