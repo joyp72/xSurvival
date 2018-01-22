@@ -2,15 +2,28 @@ package com.joi.xsurvival.maps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_12_R1.block.CraftStructureBlock;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.joi.xsurvival.Settings;
 import com.joi.xsurvival.commands.MessageManager;
 import com.joi.xsurvival.commands.MessageManager.MessageType;
+import com.joi.xsurvival.scoreboard.ScoreBoard;
 import com.joi.xsurvival.utils.LocationUtils;
 
+import main.RollbackAPI;
 import net.md_5.bungee.api.ChatColor;
 
 public class Map {
@@ -19,22 +32,73 @@ public class Map {
 	private MapState state;
 	private List<Data> datas;
 	private Location spawn;
+	private int id;
+	private List<Location> fires;
+	private List<Location> chests;
+	private List<Location> tempchests;
 
 	public Map(String n) {
 		name = n;
 		datas = new ArrayList<Data>();
+		fires = new ArrayList<Location>();
+		tempchests = new ArrayList<Location>();
 		loadFromConfig();
+		setupSB();
+		if (spawn != null) {
+			chests = new ArrayList<Location>(
+					RollbackAPI.getBlocksOfTypeInRegion(spawn.getWorld(), "xs", Material.CHEST));
+		}
 		saveToConfig();
 		checkState();
+	}
 
+	public void setupSB() {
+		if (spawn != null) {
+			fires.clear();
+			List<Location> locs = new ArrayList<Location>(
+					RollbackAPI.getBlocksOfTypeInRegion(spawn.getWorld(), "xs", Material.STRUCTURE_BLOCK));
+			for (Location l : locs) {
+				CraftStructureBlock sb = (CraftStructureBlock) l.getBlock().getState();
+				if (sb.getSnapshotNBT().getString("metadata").equalsIgnoreCase("fire")) {
+					fires.add(l.clone().add(0, 2, 0));
+				}
+			}
+		}
+	}
+
+	public void setupChest() {
+		Random r = new Random();
+		for (Location loc : chests) {
+			int ch = r.nextInt(100) + 1;
+			int slot = r.nextInt(26);
+			ItemStack item = new ItemStack(Material.AIR);
+			if (ch <= 25) {
+				int ch2 = r.nextInt(2) + 1;
+				if (ch2 == 1) {
+					item = new ItemStack(Material.POTION, 1, (byte) 0);
+				} else if (ch2 == 2) {
+					item = new ItemStack(Material.POTION, 1, (byte) 0);
+					item.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
+					ItemMeta meta = item.getItemMeta();
+					meta.addItemFlags(ItemFlag.values());
+					meta.setDisplayName("Medicine");
+					item.setItemMeta(meta);
+				}
+				Bukkit.getServer().broadcastMessage(Integer.toString(ch2));
+			}
+			Block b = loc.getBlock();
+			Chest c = (Chest) b.getState();
+			Inventory ci = c.getInventory();
+			ci.setItem(slot, item);
+		}
 	}
 
 	public void onTimerTick(String arg, int timer) {
-		
+
 	}
 
 	public void onTimerEnd(String arg) {
-		
+
 	}
 
 	public void saveToConfig() {
@@ -52,11 +116,27 @@ public class Map {
 	}
 
 	public void stop() {
-		
+		if (spawn != null) {
+			spawn.getWorld().setStorm(false);
+		}
+		for (Location loc : chests) {
+			Block b = loc.getBlock();
+			Chest c = (Chest) b.getState();
+			Inventory ci = c.getInventory();
+			ci.clear();
+		}
+		setState(MapState.WAITING);
 	}
 
 	public void start() {
-		
+		setState(MapState.STARTED);
+		setupChest();
+		for (Data d : datas) {
+			d.update();
+		}
+		if (spawn != null) {
+			spawn.getWorld().setStorm(true);
+		}
 	}
 
 	public void checkState() {
@@ -79,7 +159,9 @@ public class Map {
 		if (!containsPlayer(p) && state.canJoin() && getNumberOfPlayers() < 2) {
 			Data d = new Data(p, this);
 			datas.add(d);
+			d.ready();
 			message(ChatColor.GREEN + p.getName() + " joined the game.");
+			ScoreBoard.get().updateSB(p);
 			if (state.equals(MapState.WAITING) && (getNumberOfPlayers() + getNumberOfPlayers()) == 4) {
 				start();
 			}
@@ -89,6 +171,7 @@ public class Map {
 	public void removePlayer(Player p) {
 		if (containsPlayer(p)) {
 			Data d = getData(p);
+			d.stopUpdate();
 			d.restore();
 			datas.remove(d);
 			if (state.equals(MapState.STARTED) && getNumberOfPlayers() < 2) {
@@ -141,6 +224,10 @@ public class Map {
 		return false;
 	}
 
+	public List<Location> getFires() {
+		return fires;
+	}
+
 	public Data getData(Player p) {
 		for (Data a : datas) {
 			if (a.getPlayer().equals(p)) {
@@ -153,7 +240,7 @@ public class Map {
 	public Location getSpawn() {
 		return spawn;
 	}
-	
+
 	public void setSpawn(Location l) {
 		spawn = l;
 		saveToConfig();
