@@ -2,7 +2,7 @@ name: xSurvival
 author: joi
 version: 0.0.1
 main: com.joi.xsurvival.Main
-depend: [dTools]
+depend: [dTools, Citizens]
 
 commands:
   xs:

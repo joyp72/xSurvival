@@ -24,7 +24,7 @@ public class Start extends Commands {
 			return;
 		}
 		m.start();
-		MessageManager.get().message(sender, "You voted to start the game!");
+		MessageManager.get().message(sender, "You started the game!");
 	}
 
 }

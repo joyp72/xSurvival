@@ -1,5 +1,7 @@
 package com.joi.xsurvival.maps;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -86,10 +88,22 @@ public class Data {
 				t++;
 				if (t >= 10) {
 					if (!nearFire) {
-						if (temp < 6) {
-							p.damage(1);
+						if (getColdResist() == 100) {
+							temp = 20;
 						} else {
-							temp = temp - 2;
+							if (temp < 6) {
+								p.damage(1);
+							} else {
+								if (getColdResist() == 75) {
+									temp = temp - 1;
+								} else if (getColdResist() == 50) {
+									temp = temp - 1;
+								} else if (getColdResist() == 25) {
+									temp = temp - 2;
+								} else if (getColdResist() == 0) {
+									temp = temp - 3;
+								}
+							}
 						}
 					}
 					if (infection >= 6) {
@@ -188,6 +202,46 @@ public class Data {
 		return null;
 	}
 
+	public int getColdResist() {
+		Player p = getPlayer();
+		// if (p.getInventory().getHelmet() != null && p.getInventory().getChestplate()
+		// != null
+		// && p.getInventory().getLeggings() != null && p.getInventory().getBoots() !=
+		// null) {
+		List<ItemStack> items = Items.get().getArmor();
+		List<ItemStack> temp = new ArrayList<ItemStack>();
+		ItemStack helm = p.getInventory().getHelmet();
+		ItemStack chest = p.getInventory().getChestplate();
+		ItemStack legs = p.getInventory().getLeggings();
+		ItemStack boots = p.getInventory().getBoots();
+		int i = 0;
+		if (items.contains(helm)) {
+			temp.add(helm);
+		}
+		if (items.contains(chest)) {
+			temp.add(chest);
+		}
+		if (items.contains(legs)) {
+			temp.add(legs);
+		}
+		if (items.contains(boots)) {
+			temp.add(boots);
+		}
+		if (temp.size() == 4) {
+			i = 100;
+		} else if (temp.size() == 3) {
+			i = 75;
+		} else if (temp.size() == 2) {
+			i = 50;
+		} else if (temp.size() == 1) {
+			i = 25;
+		} else if (temp.size() == 0) {
+			i = 0;
+		}
+		// }
+		return i;
+	}
+
 	public String getInfectionStat() {
 		if (infection >= 14) {
 			return ChatColor.GREEN + "NORMAL";
@@ -245,10 +299,6 @@ public class Data {
 
 	public void setColdRes(int i) {
 		coldres = i;
-	}
-
-	public int getColdRes() {
-		return coldres;
 	}
 
 	public Location getLoc() {

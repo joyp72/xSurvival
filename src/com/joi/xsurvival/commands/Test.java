@@ -1,13 +1,12 @@
 package com.joi.xsurvival.commands;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
+
 import org.bukkit.entity.Player;
 
-import main.RollbackAPI;
+import com.joi.xsurvival.maps.Data;
+import com.joi.xsurvival.maps.Map;
+import com.joi.xsurvival.maps.MapManager;
 
 public class Test extends Commands {
 
@@ -18,8 +17,8 @@ public class Test extends Commands {
 	@Override
 	public void onCommand(Player sender, String[] args) {
 		Player p = sender;
-		List<Location> locs = new ArrayList<Location>(
-				RollbackAPI.getBlocksOfTypeInRegion(p.getWorld(), "xs", Material.CHEST));
-		p.sendMessage(Integer.toString(locs.size()));
+		Map m = MapManager.get().getMap(p);
+		Data d = m.getData(p);
+		p.sendMessage(Integer.toString(d.getColdResist()));
 	}
 }

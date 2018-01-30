@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -32,16 +31,13 @@ public class Map {
 	private MapState state;
 	private List<Data> datas;
 	private Location spawn;
-	private int id;
 	private List<Location> fires;
 	private List<Location> chests;
-	private List<Location> tempchests;
 
 	public Map(String n) {
 		name = n;
 		datas = new ArrayList<Data>();
 		fires = new ArrayList<Location>();
-		tempchests = new ArrayList<Location>();
 		loadFromConfig();
 		setupSB();
 		if (spawn != null) {
@@ -70,27 +66,68 @@ public class Map {
 		Random r = new Random();
 		for (Location loc : chests) {
 			int ch = r.nextInt(100) + 1;
-			int slot = r.nextInt(26);
-			ItemStack item = new ItemStack(Material.AIR);
-			if (ch <= 25) {
-				int ch2 = r.nextInt(2) + 1;
-				if (ch2 == 1) {
-					item = new ItemStack(Material.POTION, 1, (byte) 0);
-				} else if (ch2 == 2) {
-					item = new ItemStack(Material.POTION, 1, (byte) 0);
-					item.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
-					ItemMeta meta = item.getItemMeta();
-					meta.addItemFlags(ItemFlag.values());
-					meta.setDisplayName("Medicine");
-					item.setItemMeta(meta);
-				}
-				Bukkit.getServer().broadcastMessage(Integer.toString(ch2));
-			}
 			Block b = loc.getBlock();
 			Chest c = (Chest) b.getState();
 			Inventory ci = c.getInventory();
-			ci.setItem(slot, item);
+			if (ch <= 50) {
+				ci.setItem(getSlot(), getLoot());
+				ci.setItem(getSlot(), getLoot());
+				ci.setItem(getSlot(), getLoot());
+			} else if (ch <= 75) {
+				ci.setItem(getSlot(), getLoot());
+				ci.setItem(getSlot(), getLoot());
+			} else if (ch <= 100) {
+				ci.setItem(getSlot(), getLoot());
+			}
 		}
+	}
+
+	public int getSlot() {
+		Random r = new Random();
+		int slot = r.nextInt(26);
+		return slot;
+	}
+
+	public ItemStack getLoot() {
+		Random r = new Random();
+		int ch = r.nextInt(100) + 1;
+		ItemStack item = new ItemStack(Material.AIR);
+		if (ch <= 10) {
+			item = new ItemStack(Material.DIAMOND);
+		} else if (ch <= 20) {
+			int ch2 = r.nextInt(100) + 1;
+			if (ch2 <= 25) {
+				item = new ItemStack(Material.IRON_INGOT, 3);
+			} else if (ch2 <= 50) {
+				item = new ItemStack(Material.IRON_INGOT, 2);
+			} else if (ch2 <= 100) {
+				item = new ItemStack(Material.IRON_INGOT, 1);
+			}
+		} else if (ch <= 30) {
+			int ch2 = r.nextInt(100) + 1;
+			if (ch2 <= 25) {
+				item = new ItemStack(Material.COBBLESTONE, 3);
+			} else if (ch2 <= 50) {
+				item = new ItemStack(Material.COBBLESTONE, 2);
+			} else if (ch2 <= 100) {
+				item = new ItemStack(Material.COBBLESTONE, 1);
+			}
+		} else if (ch <= 50) {
+			int ch2 = r.nextInt(2) + 1;
+			if (ch2 == 1) {
+				item = new ItemStack(Material.POTION, 1, (byte) 0);
+			} else if (ch2 == 2) {
+				item = new ItemStack(Material.POTION, 1, (byte) 0);
+				item.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
+				ItemMeta meta = item.getItemMeta();
+				meta.addItemFlags(ItemFlag.values());
+				meta.setDisplayName("Medicine");
+				item.setItemMeta(meta);
+			}
+		} else if (ch <= 75) {
+			item = new ItemStack(Material.STICK, 1);
+		}
+		return item;
 	}
 
 	public void onTimerTick(String arg, int timer) {

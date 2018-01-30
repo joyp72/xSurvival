@@ -30,5 +30,6 @@ public class Join extends Commands {
 			return;
 		}
 		m2.addPlayer(sender);
+		m2.start();
 	}
 }
